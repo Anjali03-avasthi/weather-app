@@ -1,5 +1,4 @@
-const apiKey = "b7ef6a80186befd99bc79fb214d43b06"; // Your API key
-const apiURL = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+const apiURL = `/netlify/functions/weather?city=`;
 
 const searchBox = document.querySelector(".search-bar input");
 const searchBtn = document.querySelector(".search-bar button");
