@@ -1,18 +1,22 @@
-const apiURL = `/netlify/functions/weather?city=`;
-
-const searchBox = document.querySelector(".search-bar input");
-const searchBtn = document.querySelector(".search-bar button");
-const weatherIcon = document.querySelector(".weather-icon");
-const weatherCard = document.querySelector(".weather-card");
-
 async function currentWeather(city) {
-    const response = await fetch(apiURL + city + `&appid=${apiKey}`);
+   
+    const response = await fetch(apiURL + city);
 
-    if (response.status == 404) {
-        document.querySelector(".error").style.display = "block";
-        document.querySelector(".weather-info").style.display = "none";
+    if (!response.ok) {
+        const errorData = await response.json();
+        if (errorData.cod === "404") {
+             document.querySelector(".error").style.display = "block";
+             document.querySelector(".weather-info").style.display = "none";
+        } else {
+            console.error("Server-side error:", errorData);
+        }
     } else {
         const data = await response.json();
+        if (data.cod !== 200) {
+             document.querySelector(".error").style.display = "block";
+             document.querySelector(".weather-info").style.display = "none";
+             return;
+        }
 
         document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°c";
         document.querySelector(".city").innerHTML = data.name;
@@ -22,40 +26,38 @@ async function currentWeather(city) {
 
         const weatherCondition = data.weather[0].main;
 
-        // --- UPDATED & IMPROVED SWITCH STATEMENT ---
         switch (weatherCondition) {
             case "Clouds":
-                weatherIcon.src = "./images/clouds.png";
+                weatherIcon.src = "images/clouds.png";
                 weatherCard.style.backgroundImage = `linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('images/clouds-bg.jpg')`;
                 break;
             case "Clear":
-                weatherIcon.src = "./images/clear.png";
+                weatherIcon.src = "images/clear.png";
                 weatherCard.style.backgroundImage = `linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('images/clear-bg.jpg')`;
                 break;
             case "Rain":
             case "Drizzle":
-                weatherIcon.src = "./images/rain.png";
+                weatherIcon.src = "images/rain.png";
                 weatherCard.style.backgroundImage = `linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('images/rain-bg.jpg')`;
                 break;
             case "Mist":
             case "Haze":
             case "Smoke":
             case "Fog":
-                weatherIcon.src = "./images/mist.png";
+                weatherIcon.src = "images/mist.png";
                 weatherCard.style.backgroundImage = `linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('images/mist-bg.jpg')`;
                 break;
             case "Snow":
-                weatherIcon.src = "./images/snow.png";
+                weatherIcon.src = "images/snow.png";
                 weatherCard.style.backgroundImage = `linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('images/snow-bg.jpg')`;
                 break;
             case "Thunderstorm":
-                weatherIcon.src = "./images/thunderstorm.png"; // You might need to add a thunderstorm.png image
+                weatherIcon.src = "images/thunderstorm.png";
                 weatherCard.style.backgroundImage = `linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('images/rain-bg.jpg')`;
                 break;
             default:
-                // For any other condition, use a default icon and background
-                weatherIcon.src = "./images/clear.png"; 
-                weatherCard.style.backgroundImage = `none`; 
+                weatherIcon.src = "images/clear.png";
+                weatherCard.style.backgroundImage = `none`;
                 break;
         }
 
@@ -63,13 +65,3 @@ async function currentWeather(city) {
         document.querySelector(".error").style.display = "none";
     }
 }
-
-searchBtn.addEventListener("click", () => {
-    currentWeather(searchBox.value);
-});
-
-searchBox.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-        currentWeather(searchBox.value);
-    }
-});
